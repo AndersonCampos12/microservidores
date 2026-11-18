@@ -19,10 +19,11 @@ import type {
   NamespaceId,
   ProfileHashBase,
   StorageHashBase,
+  ValueObjectTypesFromStorage,
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'bdf84c83adcc796638599553a64e4fc95ddda80ce50f4cc0d34c348404705ac3'>;
+  StorageHashBase<'5480a96448725fb984b65bae825bb8a780fae4d82664c36b5e6359870e458f09'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -30,7 +31,22 @@ export type ProfileHash =
 export type CodecTypes = MongoCodecTypes;
 
 type ParameterizedOutputTypeFunctions = MongoParameterizedOutputTypes;
-
+type ValueObjectOutputTypes = ValueObjectTypesFromStorage<
+  ContractBase['storage']['namespaces'],
+  CodecTypes,
+  ParameterizedOutputTypeFunctions,
+  FieldTypeOverrides,
+  'output'
+>;
+type ValueObjectInputTypes = ValueObjectTypesFromStorage<
+  ContractBase['storage']['namespaces'],
+  CodecTypes,
+  ParameterizedOutputTypeFunctions,
+  FieldTypeOverrides,
+  'input'
+>;
+export type DetalleFacturaOutput = ValueObjectOutputTypes['__unbound__']['DetalleFactura'];
+export type DetalleFacturaInput = ValueObjectInputTypes['__unbound__']['DetalleFactura'];
 type FieldTypeOverrides = {};
 export type FieldOutputTypes = FieldTypesFromDomain<
   ContractBase['domain']['namespaces'],
@@ -50,28 +66,22 @@ export type FieldInputTypes = FieldTypesFromDomain<
 >;
 
 export namespace Models {
-  export type unbound_Post = {
-    authorId: FieldOutputTypes['__unbound__']['Post']['authorId'];
-    content: FieldOutputTypes['__unbound__']['Post']['content'];
-    id: FieldOutputTypes['__unbound__']['Post']['id'];
-    title: FieldOutputTypes['__unbound__']['Post']['title'];
-    author: unbound_User;
-    readonly [RelationKeys]?: 'author';
-  };
-  export type unbound_User = {
-    email: FieldOutputTypes['__unbound__']['User']['email'];
-    id: FieldOutputTypes['__unbound__']['User']['id'];
-    name: FieldOutputTypes['__unbound__']['User']['name'];
-    username: FieldOutputTypes['__unbound__']['User']['username'];
-    posts: unbound_Post[];
-    readonly [RelationKeys]?: 'posts';
+  export type unbound_Factura = {
+    cod_cliente: FieldOutputTypes['__unbound__']['Factura']['cod_cliente'];
+    codigo: FieldOutputTypes['__unbound__']['Factura']['codigo'];
+    descuento: FieldOutputTypes['__unbound__']['Factura']['descuento'];
+    detalles_factura: FieldOutputTypes['__unbound__']['Factura']['detalles_factura'];
+    fecha: FieldOutputTypes['__unbound__']['Factura']['fecha'];
+    iva: FieldOutputTypes['__unbound__']['Factura']['iva'];
+    total: FieldOutputTypes['__unbound__']['Factura']['total'];
+    total_a_pagar: FieldOutputTypes['__unbound__']['Factura']['total_a_pagar'];
+    readonly [RelationKeys]?: never;
   };
 }
 
 export declare const models: {
   __unbound__: {
-    Post: Models.unbound_Post;
-    User: Models.unbound_User;
+    Factura: Models.unbound_Factura;
   };
 };
 
@@ -85,31 +95,12 @@ type ContractBase = Omit<
         readonly kind: 'mongo-database';
         readonly entries: {
           readonly collection: {
-            readonly posts: {
-              readonly kind: 'mongo-collection';
-              readonly validator: {
-                readonly jsonSchema: {
-                  readonly additionalProperties: false;
-                  readonly bsonType: 'object';
-                  readonly properties: {
-                    readonly _id: { readonly bsonType: 'objectId' };
-                    readonly authorId: { readonly bsonType: 'objectId' };
-                    readonly content: { readonly bsonType: readonly ['null', 'string'] };
-                    readonly title: { readonly bsonType: 'string' };
-                  };
-                  readonly required: readonly ['_id', 'authorId', 'title'];
-                };
-                readonly kind: 'mongo-validator';
-                readonly validationAction: 'error';
-                readonly validationLevel: 'strict';
-              };
-            };
-            readonly users: {
+            readonly Factura: {
               readonly indexes: readonly [
                 {
-                  readonly keys: readonly [{ readonly direction: 1; readonly field: 'email' }];
+                  readonly keys: readonly [{ readonly direction: 1; readonly field: 'codigo' }];
                   readonly kind: 'mongo-index';
-                  readonly name: 'email_1';
+                  readonly name: 'codigo_1';
                   readonly unique: true;
                 },
               ];
@@ -120,15 +111,76 @@ type ContractBase = Omit<
                   readonly bsonType: 'object';
                   readonly properties: {
                     readonly _id: { readonly bsonType: 'objectId' };
-                    readonly email: { readonly bsonType: 'string' };
-                    readonly name: { readonly bsonType: readonly ['null', 'string'] };
-                    readonly username: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly cod_cliente: { readonly bsonType: 'int' };
+                    readonly codigo: { readonly bsonType: 'string' };
+                    readonly descuento: { readonly bsonType: 'double' };
+                    readonly detalles_factura: {
+                      readonly bsonType: 'array';
+                      readonly items: {
+                        readonly additionalProperties: false;
+                        readonly bsonType: 'object';
+                        readonly properties: {
+                          readonly cantidad: { readonly bsonType: 'int' };
+                          readonly cod_factura: { readonly bsonType: 'int' };
+                          readonly cod_producto: { readonly bsonType: 'int' };
+                          readonly codigo: { readonly bsonType: 'int' };
+                          readonly subtotal: { readonly bsonType: 'double' };
+                        };
+                        readonly required: readonly [
+                          'cantidad',
+                          'cod_factura',
+                          'cod_producto',
+                          'codigo',
+                          'subtotal',
+                        ];
+                      };
+                    };
+                    readonly fecha: { readonly bsonType: 'date' };
+                    readonly iva: { readonly bsonType: 'double' };
+                    readonly total: { readonly bsonType: 'double' };
+                    readonly total_a_pagar: { readonly bsonType: 'double' };
                   };
-                  readonly required: readonly ['_id', 'email'];
+                  readonly required: readonly [
+                    '_id',
+                    'cod_cliente',
+                    'codigo',
+                    'descuento',
+                    'detalles_factura',
+                    'fecha',
+                    'iva',
+                    'total',
+                    'total_a_pagar',
+                  ];
                 };
                 readonly kind: 'mongo-validator';
                 readonly validationAction: 'error';
                 readonly validationLevel: 'strict';
+              };
+            };
+          };
+          readonly valueObject: {
+            readonly DetalleFactura: {
+              readonly fields: {
+                readonly cantidad: {
+                  readonly nullable: false;
+                  readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+                };
+                readonly cod_factura: {
+                  readonly nullable: false;
+                  readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+                };
+                readonly cod_producto: {
+                  readonly nullable: false;
+                  readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+                };
+                readonly codigo: {
+                  readonly nullable: false;
+                  readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+                };
+                readonly subtotal: {
+                  readonly nullable: false;
+                  readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/double@1' };
+                };
               };
             };
           };
@@ -142,95 +194,69 @@ type ContractBase = Omit<
   readonly target: 'mongo';
   readonly targetFamily: 'mongo';
   readonly roots: {
-    readonly posts: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'Post' };
-    readonly users: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'User' };
+    readonly Factura: {
+      readonly namespace: '__unbound__' & NamespaceId;
+      readonly model: 'Factura';
+    };
   };
   readonly domain: {
     readonly namespaces: {
       readonly __unbound__: {
         readonly models: {
-          readonly Post: {
+          readonly Factura: {
             readonly fields: {
-              readonly authorId: {
+              readonly cod_cliente: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
               };
-              readonly content: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
-              };
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
-              };
-              readonly title: {
+              readonly codigo: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
               };
-            };
-            readonly relations: {
-              readonly author: {
-                readonly to: {
-                  readonly namespace: '__unbound__' & NamespaceId;
-                  readonly model: 'User';
-                };
-                readonly cardinality: 'N:1';
+              readonly descuento: {
                 readonly nullable: false;
-                readonly on: {
-                  readonly localFields: readonly ['authorId'];
-                  readonly targetFields: readonly ['id'];
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/double@1' };
+              };
+              readonly detalles_factura: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'valueObject';
+                  readonly plane: 'storage';
+                  readonly namespaceId: '__unbound__';
+                  readonly entityKind: 'valueObject';
+                  readonly entityName: 'DetalleFactura';
                 };
+                readonly many: { readonly elementNullable: false };
+              };
+              readonly fecha: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+              readonly iva: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/double@1' };
+              };
+              readonly total: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/double@1' };
+              };
+              readonly total_a_pagar: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/double@1' };
               };
             };
+            readonly relations: Record<string, never>;
             readonly storage: {
-              readonly collection: 'posts';
+              readonly collection: 'Factura';
               readonly fields: {
-                readonly authorId: { readonly field: 'authorId' };
-                readonly content: { readonly field: 'content' };
-                readonly id: { readonly field: '_id' };
-                readonly title: { readonly field: 'title' };
-              };
-            };
-          };
-          readonly User: {
-            readonly fields: {
-              readonly email: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
-              };
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
-              };
-              readonly name: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
-              };
-              readonly username: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
-              };
-            };
-            readonly relations: {
-              readonly posts: {
-                readonly to: {
-                  readonly namespace: '__unbound__' & NamespaceId;
-                  readonly model: 'Post';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['authorId'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly collection: 'users';
-              readonly fields: {
-                readonly email: { readonly field: 'email' };
-                readonly id: { readonly field: '_id' };
-                readonly name: { readonly field: 'name' };
-                readonly username: { readonly field: 'username' };
+                readonly cod_cliente: { readonly field: 'cod_cliente' };
+                readonly codigo: { readonly field: 'codigo' };
+                readonly descuento: { readonly field: 'descuento' };
+                readonly detalles_factura: { readonly field: 'detalles_factura' };
+                readonly fecha: { readonly field: 'fecha' };
+                readonly iva: { readonly field: 'iva' };
+                readonly total: { readonly field: 'total' };
+                readonly total_a_pagar: { readonly field: 'total_a_pagar' };
               };
             };
           };

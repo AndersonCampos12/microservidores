@@ -1,19 +1,20 @@
-// use prisma-8
+//use prisma-8
+model Factura {
+  codigo String @unique
+  fecha Date
+  cod_cliente Int32
+  total Double
+  descuento Double
+  iva Double
+  total_a_pagar Double
 
-model User {
-  id       ObjectId @id @map("_id")
-  email    String   @unique
-  username String?
-  name     String?
-  posts    Post[]
-  @@map("users")
+  detalles_factura DetalleFactura[]
 }
 
-model Post {
-  id       ObjectId @id @map("_id")
-  title    String
-  content  String?
-  author   User     @relation(fields: [authorId], references: [id])
-  authorId ObjectId
-  @@map("posts")
+type DetalleFactura {
+  codigo Int32
+  cod_factura Int32
+  cod_producto Int32
+  cantidad Int32
+  subtotal Double
 }
