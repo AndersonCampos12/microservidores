@@ -62,4 +62,26 @@ export class FacturaService {
         return db.orm.Factura.where({ codigo }).update({ detalles_factura: detalles });
     }
 
+    //patch 
+    async actualizarDetalle(codigo: string, codigoDetalle: number, data: Partial<DetalleFactura>){
+        const factura = await this.consultar(codigo);
+        const existe = factura.detalles_factura.some(d => d.codigo === codigoDetalle);
+        if(!existe){
+            throw new NotFoundException("Detalle no encontrado");
+        }
+        const detalles = factura.detalles_factura.map(d =>
+            d.codigo === codigoDetalle ? { ...d, ...data } : d
+        );
+        return db.orm.Factura.where({ codigo }).update({ detalles_factura: detalles });
+    }
+
+    async eliminarDetalle(codigo: string, codigoDetalle: number){
+        const factura = await this.consultar(codigo);
+        const detalles = factura.detalles_factura.filter(d => d.codigo !== codigoDetalle);
+        if(detalles.length === factura.detalles_factura.length){
+            throw new NotFoundException("Detalle no encontrado");
+        }
+        return db.orm.Factura.where({ codigo }).update({ detalles_factura: detalles });
+    }
+
 }
