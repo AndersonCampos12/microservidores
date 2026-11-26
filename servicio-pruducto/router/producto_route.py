@@ -6,7 +6,7 @@ from schemas.prodcuto import ProductoCreate, ProductoResponse
 from controllers import producto_controller
 
 router = APIRouter(
-    prefix="/api",
+    prefix="/api/productos",
     tags=["producto"]
 )
 

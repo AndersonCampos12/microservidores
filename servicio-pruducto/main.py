@@ -11,7 +11,7 @@ app = FastAPI(
 
 Base.metadata.create_all(bind=engine)
 
-app.include_router(producto_router, prefix="/api")
+app.include_router(producto_router)
 
 @app.get("")
 def inicio():
