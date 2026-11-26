@@ -1,0 +1,17 @@
+# Etapa 1: Compilacion
+FROM node:26-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Etapa 2: Produccion
+FROM node:26-alpine AS production
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+COPY --from=builder /app/dist ./dist
+EXPOSE 3003
+CMD ["npm", "run", "start:prod"]
